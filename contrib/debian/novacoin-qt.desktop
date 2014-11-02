@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=UroDark
+Comment=UroDark P2P Cryptocurrency
+Comment[fr]=UroDark, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=UroDark, eşten eşe kriptografik sanal para birimi
+Exec=/usr/bin/urodark-qt
+Terminal=false
+Type=Application
+Icon=/usr/share/pixmaps/bitcoin80.xpm
+MimeType=x-scheme-handler/urodark;
+Categories=Office;

@@ -1,0 +1,2 @@
+debian/bin/urodarkd usr/bin
+src/urodarkd usr/lib/urodark
