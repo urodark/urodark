@@ -287,7 +287,12 @@ static bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64& nStakeModifier
         }
     }*/
     //nStakeModifier = pindex->nStakeModifier;
-	nStakeModifier = 0x0000000000000000;
+	const CBlockIndex* pindexFrom = mapBlockIndex[hashBlockFrom];
+	const CBlockIndex* pindex = pindexFrom;
+	if(pindex->nHeight > 14500) {
+	nStakeModifier = 0x0000000000000000; }
+	if(pindex->nHeight < 14501)
+	nStakeModifier = 0x0000000000000011;
     return true;
 }
 
