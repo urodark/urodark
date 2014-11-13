@@ -1054,7 +1054,7 @@ int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTi
     int64 nRewardCoinYear;
 	int nHeight = pindexBest->nHeight;
 	
-	nRewardCoinYear = 10000/nHeight;
+	nRewardCoinYear = 10000/nHeight * COIN;
 	//nRewardCoinYear = MAX_MINT_PROOF_OF_STAKE;
 	
     int64 nSubsidy = nCoinAge * nRewardCoinYear / 365;
