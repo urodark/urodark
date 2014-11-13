@@ -447,9 +447,7 @@ bool ScanForStakeKernelHash(MetaMap &mapMeta, KernelSearchSettings &settings, Co
                         nStakeModifier, nBlockTime, nTxOffset, pcoin.first->nTime, pcoin.second, nTimeTx, hashProofOfStake.GetHex().c_str());
 
                 kernelcoin = pcoin;
-				if(pindex->nHeight < 14501) {
-				return false; }
-                else return true;
+                return true;
             }
 
             if (fDebug)
