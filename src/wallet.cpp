@@ -1658,18 +1658,20 @@ bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint
                     // Load transaction index item
                     if (!txdb.ReadTxIndex(pcoin->first->GetHash(), txindex))
                         continue;
+						printf("Load transaction index item ");
 
                     // Read block header
                     if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
                         continue;
+						printf("Read block header ");
 
                     uint64 nStakeModifier = 0;
-                    if (!GetKernelStakeModifier(block.GetHash(), nStakeModifier))
-                        continue;
+                    //if (!GetKernelStakeModifier(block.GetHash(), nStakeModifier))
+					//    continue;
 
                     // Add meta record
                     // txid => ((txindex, (tx, vout.n)), (block, modifier))
-                    mapMeta[pcoin->first->GetHash()] = make_pair(make_pair(txindex, *pcoin), make_pair(block, nStakeModifier));
+                    mapMeta[make_pair(pcoin->first->GetHash(), pcoin->second)] = make_pair(make_pair(txindex, *pcoin), make_pair(block, nStakeModifier));
 
                     if (fDebug)
                         printf("Load coin: %s\n", pcoin->first->GetHash().GetHex().c_str());
@@ -1677,14 +1679,14 @@ bool CWallet::GetStakeWeight(const CKeyStore& keystore, uint64& nMinWeight, uint
             }
 
             if (fDebug)
-                printf("Get stake weight: %zu meta items loaded for %zu coins\n", mapMeta.size(), setCoins.size());
+                printf("Get stake weight: %lu meta items loaded for %lu coins\n", mapMeta.size(), setCoins.size());
 
             fCoinsDataActual = true;
         }
     }
 
 
-    // txid => ((txindex, (tx, vout.n)), (block, modifier))
+    // (txid, vout.n) => ((txindex, (tx, vout.n)), (block, modifier))
     for(MetaMap::const_iterator meta_item = mapMeta.begin(); meta_item != mapMeta.end(); meta_item++)
     {
         // Get coin
@@ -1891,18 +1893,20 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
                     // Load transaction index item
                     if (!txdb.ReadTxIndex(pcoin->first->GetHash(), txindex))
                         continue;
+						printf("Load transaction index item ");
 
                     // Read block header
                     if (!block.ReadFromDisk(txindex.pos.nFile, txindex.pos.nBlockPos, false))
                         continue;
+						printf("Read block header ");
 
                     uint64 nStakeModifier = 0;
-                    if (!GetKernelStakeModifier(block.GetHash(), nStakeModifier))
-                        continue;
+                    //if (!GetKernelStakeModifier(block.GetHash(), nStakeModifier))
+                    //    continue;
 
                     // Add meta record
                     // txid => ((txindex, (tx, vout.n)), (block, modifier))
-                    mapMeta[pcoin->first->GetHash()] = make_pair(make_pair(txindex, *pcoin), make_pair(block, nStakeModifier));
+                    mapMeta[make_pair(pcoin->first->GetHash(), pcoin->second)] = make_pair(make_pair(txindex, *pcoin), make_pair(block, nStakeModifier));
 
                     if (fDebug)
                         printf("Load coin: %s\n", pcoin->first->GetHash().GetHex().c_str());
@@ -1910,7 +1914,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             }
 
             if (fDebug)
-                printf("Stake miner: %zu meta items loaded for %zu coins\n", mapMeta.size(), setCoins.size());
+                printf("Stake miner: %lu meta items loaded for %lu coins\n", mapMeta.size(), setCoins.size());
 
             fCoinsDataActual = true;
         }
@@ -1998,7 +2002,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     if (nCredit == 0 || nCredit > nBalance - nReserveBalance)
         return false;
 
-    // txid => ((txindex, (tx, vout.n)), (block, modifier))
+    // (txid, vout.n) => ((txindex, (tx, vout.n)), (block, modifier))
     for(MetaMap::const_iterator meta_item = mapMeta.begin(); meta_item != mapMeta.end(); meta_item++)
     {
         // Get coin

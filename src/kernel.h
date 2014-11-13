@@ -20,7 +20,7 @@ extern bool fCoinsDataActual;
 static const int MODIFIER_INTERVAL_RATIO = 3;
 
 // Whether the given block is subject to new modifier protocol
-bool IsFixedModifierInterval(unsigned int nTimeBlock);
+bool IsFixedModifierInterval(int nHeight);
 
 // Compute the hash modifier for proof-of-stake
 bool ComputeNextStakeModifier(const CBlockIndex* pindexCurrent, uint64& nStakeModifier, bool& fGeneratedStakeModifier);
@@ -46,7 +46,7 @@ typedef set<pair<const CWalletTx*,unsigned int> > CoinsSet;
 
 // Preloaded coins metadata
 // txid => ((txindex, (tx, vout.n)), (block, modifier))
-typedef map<uint256, pair<pair<CTxIndex, pair<const CWalletTx*,unsigned int> >, pair<CBlock, uint64> > > MetaMap;
+typedef std::map<std::pair<uint256, unsigned int>, std::pair<std::pair<CTxIndex, std::pair<const CWalletTx*,unsigned int> >, std::pair<CBlock, uint64> > > MetaMap;
 
 // Scan given coins set for kernel solution
 bool ScanForStakeKernelHash(MetaMap &mapMeta, KernelSearchSettings &settings, CoinsSet::value_type &kernelcoin, unsigned int &nTimeTx, unsigned int &nBlockTime);

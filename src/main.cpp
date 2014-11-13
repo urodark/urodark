@@ -1052,8 +1052,10 @@ int64 GetProofOfWorkReward(int nHeight, unsigned int nBits, int64 nFees)
 int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly)
 {
     int64 nRewardCoinYear;
-
-	nRewardCoinYear = MAX_MINT_PROOF_OF_STAKE;
+	int nHeight = pindexBest->nHeight;
+	
+	nRewardCoinYear = 10000/nHeight;
+	//nRewardCoinYear = MAX_MINT_PROOF_OF_STAKE;
 	
     int64 nSubsidy = nCoinAge * nRewardCoinYear / 365;
 
@@ -3014,14 +3016,6 @@ string GetWarnings(string strFor)
     {
         nPriority = 1000;
         strStatusBar = strMiscWarning;
-    }
-
-    // if detected unmet upgrade requirement enter safe mode
-    // Note: Modifier upgrade requires blockchain redownload if past protocol switch
-    if (IsFixedModifierInterval(nModifierUpgradeTime + 60*60*24)) // 1 day margin
-    {
-        nPriority = 5000;
-        strStatusBar = strRPC = "WARNING: Blockchain redownload required approaching or past v.0.4.4.6u4 upgrade deadline.";
     }
 
     // if detected invalid checkpoint enter safe mode

@@ -39,7 +39,7 @@ static const int64 MIN_TX_FEE = CENT;
 static const int64 MIN_RELAY_TX_FEE = CENT;
 
 static const int64 MAX_MONEY = 2000000 * COIN;
-static const int64 MAX_MINT_PROOF_OF_STAKE = 100 * COIN;
+static const int64 MAX_MINT_PROOF_OF_STAKE = 1 * COIN;
 static const int64 MIN_TXOUT_AMOUNT = CENT/100;
 
 inline bool MoneyRange(int64 nValue) { return (nValue >= 0 && nValue <= MAX_MONEY); }

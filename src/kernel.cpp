@@ -36,9 +36,9 @@ static std::map<int, unsigned int> mapStakeModifierCheckpointsTestNet =
     ;
 
 // Whether the given block is subject to new modifier protocol
-bool IsFixedModifierInterval(unsigned int nTimeBlock)
+bool IsFixedModifierInterval(int nHeight)
 {
-    return (nTimeBlock >= (fTestNet? nModifierTestSwitchTime : nModifierSwitchTime));
+    return (nHeight >= (fTestNet? 1 : 14500));
 }
 
 // Get time weight
@@ -173,7 +173,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexCurrent, uint64& nStakeMo
     if (nModifierTime / nModifierInterval >= pindexCurrent->GetBlockTime() / nModifierInterval)
     {
         // fixed interval protocol requires current block timestamp also be in a different modifier interval
-        if (IsFixedModifierInterval(pindexCurrent->nTime))
+        if (IsFixedModifierInterval(pindexPrev->nHeight))
         {
             if (fDebug)
             {
@@ -261,7 +261,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexCurrent, uint64& nStakeMo
 static bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64& nStakeModifier, int& nStakeModifierHeight, int64& nStakeModifierTime, bool fPrintProofOfStake)
 {
     nStakeModifier = 0;
-    if (!mapBlockIndex.count(hashBlockFrom))
+    /*if (!mapBlockIndex.count(hashBlockFrom))
         return error("GetKernelStakeModifier() : block not indexed");
     const CBlockIndex* pindexFrom = mapBlockIndex[hashBlockFrom];
     nStakeModifierHeight = pindexFrom->nHeight;
@@ -285,8 +285,9 @@ static bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64& nStakeModifier
             nStakeModifierHeight = pindex->nHeight;
             nStakeModifierTime = pindex->GetBlockTime();
         }
-    }
-    nStakeModifier = pindex->nStakeModifier;
+    }*/
+    //nStakeModifier = pindex->nStakeModifier;
+	nStakeModifier = 0x0000000000000000;
     return true;
 }
 
@@ -366,6 +367,7 @@ bool CheckStakeKernelHash(unsigned int nBits, const CBlock& blockFrom, unsigned 
     // Now check if proof-of-stake hash meets target protocol
     if (CBigNum(hashProofOfStake) > bnCoinDayWeight * bnTargetPerCoinDay)
         return false;
+		printf("hashProofOfStake = %s bnCoinDayWeight = %s bnTargetPerCoinDay = %s", hashProofOfStake.ToString().c_str(), bnCoinDayWeight.ToString().c_str(), bnTargetPerCoinDay.ToString().c_str());
     if (fDebug && !fPrintProofOfStake)
     {
         printf("CheckStakeKernelHash() : using modifier 0x%016"PRI64x" at height=%d timestamp=%s for block from height=%d timestamp=%s\n",
@@ -482,7 +484,7 @@ bool CheckProofOfStake(const CTransaction& tx, unsigned int nBits, uint256& hash
         return fDebug? error("CheckProofOfStake() : read block failed") : false; // unable to read block of previous transaction
 
     if (!CheckStakeKernelHash(nBits, block, txindex.pos.nTxPos - txindex.pos.nBlockPos, txPrev, txin.prevout, tx.nTime, hashProofOfStake, targetProofOfStake, fDebug))
-        return tx.DoS(1, error("CheckProofOfStake() : INFO: check kernel failed on coinstake %s, hashProof=%s", tx.GetHash().ToString().c_str(), hashProofOfStake.ToString().c_str())); // may occur during initial download or if behind on block chain sync
+        return tx.DoS(1, error("CheckProofOfStake() : INFO: check kernel failed on coinstake %s, hashProof=%s", tx.GetHash().ToString().c_str(), hashProofOfStake.GetHex().c_str())); // may occur during initial download or if behind on block chain sync
 
     return true;
 }
