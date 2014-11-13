@@ -289,9 +289,9 @@ static bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64& nStakeModifier
     //nStakeModifier = pindex->nStakeModifier;
 	const CBlockIndex* pindexFrom = mapBlockIndex[hashBlockFrom];
 	const CBlockIndex* pindex = pindexFrom;
-	if(pindex->nHeight > 14500) {
+	if(pindexBest->nHeight > 14500) {
 	nStakeModifier = 0x0000000000000000; }
-	if(pindex->nHeight < 14501)
+	if(pindexBest->nHeight < 14501)
 	nStakeModifier = 0x0000000000000011;
     return true;
 }
@@ -439,7 +439,7 @@ bool ScanForStakeKernelHash(MetaMap &mapMeta, KernelSearchSettings &settings, Co
 
             // Calculate kernel hash
             hashProofOfStake = Hash(ss.begin(), ss.end());
-
+	
             if (bnTargetProofOfStake >= CBigNum(hashProofOfStake))
             {
                 if (fDebug)
@@ -447,7 +447,9 @@ bool ScanForStakeKernelHash(MetaMap &mapMeta, KernelSearchSettings &settings, Co
                         nStakeModifier, nBlockTime, nTxOffset, pcoin.first->nTime, pcoin.second, nTimeTx, hashProofOfStake.GetHex().c_str());
 
                 kernelcoin = pcoin;
-                return true;
+				if(pindexBest->nHeight < 14501) {
+				return false; }
+                else return true;
             }
 
             if (fDebug)
