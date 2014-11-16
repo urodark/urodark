@@ -39,6 +39,7 @@ libzerocoin::Params* ZCParams;
 
 CBigNum bnProofOfWorkLimit(~uint256(0) >> 20); // "standard" scrypt target limit for proof of work, results with 0,000244140625 proof-of-work difficulty
 CBigNum bnProofOfStakeLimit(~uint256(0) >> 24);
+CBigNum bnProofOfStakeNewLimit(~uint256(0) >> 20);
 uint256 nPoWBase = uint256("0x00000000ffff0000000000000000000000000000000000000000000000000000"); // difficulty-1 target
 
 CBigNum bnProofOfWorkLimitTestNet(~uint256(0) >> 12);
@@ -999,7 +1000,11 @@ uint256 WantedByOrphan(const CBlock* pblockOrphan)
 // select stake target limit according to hard-coded conditions
 CBigNum inline GetProofOfStakeLimit(int nHeight, unsigned int nTime)
 {
+    if(nHeight + 1 > 15500)
+        return bnProofOfStakeNewLimit;
+		
     return bnProofOfStakeLimit;
+	
 }
 
 // miner's coin base reward
@@ -1052,16 +1057,26 @@ int64 GetProofOfWorkReward(int nHeight, unsigned int nBits, int64 nFees)
 int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly)
 {
     int64 nRewardCoinYear;
+	double nGravityStake;
 	int nHeight = pindexBest->nHeight;
 	
-	nRewardCoinYear = 10000/nHeight * COIN;
-	//nRewardCoinYear = MAX_MINT_PROOF_OF_STAKE;
+	nGravityStake = static_cast<double>(10000) / nHeight;
+	nRewardCoinYear = nGravityStake * COIN;
 	
-    int64 nSubsidy = nCoinAge * nRewardCoinYear / 365;
-
-	if (fDebug && GetBoolArg("-printcreation"))
-        printf("GetProofOfStakeReward(): create=%s nCoinAge=%"PRI64d" nBits=%d\n", FormatMoney(nSubsidy).c_str(), nCoinAge, nBits);
+	if (nHeight < 15500 && !fTestNet) 
+	{
+    int64 nSubsidy = 0;	
+		if (fDebug && GetBoolArg("-printcreation"))
+			printf("nHeight=%d BEFORE THE 15500 FORK\n", nHeight);
     return nSubsidy;
+	}
+	
+	else  {
+	int64 nSubsidy = nCoinAge * static_cast<int64>(nRewardCoinYear) / 365;	
+		if (fDebug && GetBoolArg("-printcreation"))
+			printf("nHeight=%d nGravityStake=%f nRewardCoinYear=%"PRI64d"\n", nHeight, nGravityStake, nRewardCoinYear);
+    return nSubsidy;
+	}
 }
 
 static const int64 nTargetTimespan = 15 * 60;
