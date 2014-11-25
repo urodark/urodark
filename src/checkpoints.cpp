@@ -26,6 +26,8 @@ namespace Checkpoints
         boost::assign::map_list_of
         ( 0,     std::make_pair(hashGenesisBlock, 1413383645) )
 		(71,  std::make_pair(uint256("0x00000245ba02a92d3d818a1c2fbf2a1a2726baea184f125172bc45be9a67b96f"), 1414952296) )
+		(24300,  std::make_pair(uint256("0xc29c77061f4fba418c22b815f8be9bbf16e22e68e6730a6183695d0a67be2183"), 1416950022) )
+		
 		
     ;
 

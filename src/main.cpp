@@ -1054,11 +1054,11 @@ int64 GetProofOfWorkReward(int nHeight, unsigned int nBits, int64 nFees)
 
 // miner's coin stake reward based on nBits and coin age spent (coin-days)
 // simple algorithm, not depend on the diff
-int64 GetProofOfStakeReward(int64 nCoinAge, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly)
+int64 GetProofOfStakeReward(int nHeight, int64 nCoinAge, unsigned int nBits, unsigned int nTime, bool bCoinYearOnly)
 {
     int64 nRewardCoinYear;
 	double nGravityStake;
-	int nHeight = pindexBest->nHeight;
+//	int nHeight = pindexBest->nHeight;
 	
 	nGravityStake = static_cast<double>(10000) / nHeight;
 	nRewardCoinYear = nGravityStake * COIN;
@@ -1120,7 +1120,7 @@ unsigned int ComputeMinWork(unsigned int nBase, int64 nTime)
 //
 unsigned int ComputeMinStake(unsigned int nBase, int64 nTime, unsigned int nBlockTime)
 {
-    return ComputeMaxBits(GetProofOfStakeLimit(0, nBlockTime), nBase, nTime);
+    return ComputeMaxBits(GetProofOfStakeLimit(16000, nBlockTime), nBase, nTime);
 }
 
 
@@ -1507,9 +1507,9 @@ bool CTransaction::ConnectInputs(CTxDB& txdb, MapPrevTx inputs, map<uint256, CTx
             unsigned int nTxSize = (nTime > VALIDATION_SWITCH_TIME || fTestNet) ? GetSerializeSize(SER_NETWORK, PROTOCOL_VERSION) : 0;
 
             int64 nReward = GetValueOut() - nValueIn;
-            int64 nCalculatedReward = GetProofOfStakeReward(nCoinAge, pindexBlock->nBits, nTime) - GetMinFee(1, false, GMF_BLOCK, nTxSize) + CENT;
+            int64 nCalculatedReward = GetProofOfStakeReward(pindexBlock->nHeight, nCoinAge, pindexBlock->nBits, nTime) - GetMinFee(1, false, GMF_BLOCK, nTxSize) + CENT;
 
-            if (nReward > nCalculatedReward)
+            if (0.9 * nReward > nCalculatedReward)
                 return DoS(100, error("ConnectInputs() : coinstake pays too much(actual=%"PRI64d" vs calculated=%"PRI64d")", nReward, nCalculatedReward));
         }
         else
@@ -1713,6 +1713,7 @@ bool CBlock::ConnectBlock(CTxDB& txdb, CBlockIndex* pindex, bool fJustCheck)
     if (!control.Wait())
         return DoS(100, false);
 
+	
     if (IsProofOfWork())
     {
         int64 nBlockReward = GetProofOfWorkReward(pindex->nHeight, nBits, fProtocol048 ? nFees : 0);
