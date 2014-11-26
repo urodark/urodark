@@ -43,7 +43,6 @@ Value getmininginfo(const Array& params, bool fHelp)
     weight.push_back(Pair("combined",  (uint64_t)nWeight));
     obj.push_back(Pair("stakeweight", weight));
 
-    obj.push_back(Pair("stakeinterest",    (uint64_t)GetProofOfStakeReward(0, GetLastBlockIndex(pindexBest, true)->nBits, GetLastBlockIndex(pindexBest, true)->nTime)));
     obj.push_back(Pair("testnet",       fTestNet));
     return obj;
 }
